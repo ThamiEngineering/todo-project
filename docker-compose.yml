@@ -1,0 +1,28 @@
+services:
+  surrealdb:
+    image: surrealdb/surrealdb:v2.3.5
+    container_name: surrealdb
+    ports:
+      - "3001:8000"
+    volumes:
+      - ./database:/data
+      - ./init.surql:/docker-entrypoint-initdb.d/init.surql
+    command: >
+      start 
+      --bind 0.0.0.0:8000 
+      --user root 
+      --pass root 
+      file:///data/database.db
+    environment:
+      - SURREAL_LOG=info
+
+  app:
+    build: ./app
+    container_name: app
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./app:/app
+      - /app/node_modules
+    depends_on:
+      - surrealdb
